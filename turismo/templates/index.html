@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="hero min-h-[60vh] rounded-xl overflow-hidden relative" style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');">
+  <div class="hero-overlay bg-opacity-60 bg-black"></div>
+  <div class="hero-content text-center text-neutral-content relative z-10">
+    <div class="max-w-md">
+      <h1 class="mb-5 text-5xl font-bold text-white">Explora Pucusana</h1>
+      <p class="mb-5 text-lg text-gray-200">
+        Descubre los tesoros escondidos, la gastronomía marina y las rutas turísticas inteligentes.
+      </p>
+      <button class="btn btn-primary border-none bg-blue-600 hover:bg-blue-700 text-white">Ver Mapa Turístico 🗺️</button>
+    </div>
+  </div>
+</div>
+
+<div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+        <figure><img src="https://images.unsplash.com/photo-1566371486490-560ded23b5e4?auto=format&fit=crop&w=400&q=80" alt="Isla" /></figure>
+        <div class="card-body">
+            <h2 class="card-title text-blue-800">Boquerón del Diablo</h2>
+            <p>Formación rocosa impresionante con vistas panorámicas al océano.</p>
+            <div class="card-actions justify-end">
+                <div class="badge badge-outline">Naturaleza</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+        <figure><img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=400&q=80" alt="Comida" /></figure>
+        <div class="card-body">
+            <h2 class="card-title text-blue-800">Gastronomía Local</h2>
+            <p>Los mejores ceviches y pescados frescos directo del puerto.</p>
+            <div class="card-actions justify-end">
+                <div class="badge badge-outline">Restaurantes</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
+        <figure><img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=400&q=80" alt="Buceo" /></figure>
+        <div class="card-body">
+            <h2 class="card-title text-blue-800">Deportes Acuáticos</h2>
+            <p>Experiencias de buceo y paseos en bote por las islas.</p>
+            <div class="card-actions justify-end">
+                <div class="badge badge-outline">Aventura</div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
