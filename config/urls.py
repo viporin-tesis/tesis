@@ -1,7 +1,13 @@
 from django.contrib import admin
-from django.urls import path, include  # <--- FÍJATE AQUÍ: Agregamos 'include'
+from django.urls import path, include
+from django.conf import settings # NUEVO
+from django.conf.urls.static import static # NUEVO
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('turismo.urls')), # <--- Y AQUÍ: Conectamos tu app
+    path('', include('turismo.urls')),
 ]
+
+# NUEVO: Esto permite que Django sirva las imágenes subidas durante el desarrollo
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

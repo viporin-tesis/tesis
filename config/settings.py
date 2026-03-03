@@ -64,6 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'turismo.context_processors.alerta_perfil',
             ],
         },
     },
@@ -132,3 +133,20 @@ if not DEBUG:
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ==========================================
+# CONFIGURACIÓN DE SEGURIDAD Y SESIONES
+# ==========================================
+
+# 1. Cierra la sesión automáticamente al cerrar el navegador
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+# 2. Tiempo máximo de inactividad (en segundos). Ejemplo: 900 = 15 minutos
+SESSION_COOKIE_AGE = 30 
+
+# 3. Renueva el temporizador cada vez que el usuario hace clic en algo
+SESSION_SAVE_EVERY_REQUEST = True
+
+# 4. Le dice a Django a dónde enviar a la gente si su sesión expira o intentan 
+# entrar a una página prohibida sin iniciar sesión
+LOGIN_URL = 'login'

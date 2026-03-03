@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto mt-10 p-4 max-w-3xl">
+    
+    <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
+        
+        <div class="bg-blue-600 p-6 text-white text-center">
+            <div class="avatar placeholder mb-4">
+              <div class="bg-white text-blue-600 rounded-full w-20 ring ring-white ring-offset-base-100 ring-offset-2">
+                <span class="text-3xl font-bold">{{ user.username|make_list|first|upper }}</span>
+              </div>
+            </div>
+            <h2 class="text-3xl font-bold">Perfil de {{ user.username }}</h2>
+            <p class="text-blue-100 mt-2">Personaliza tu experiencia en Explora Pucusana</p>
+        </div>
+
+        <form method="POST" class="p-8">
+            {% csrf_token %}
+            
+            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-6">Tus Intereses Turísticos 🎯</h3>
+            <p class="text-gray-500 mb-4 text-sm">Selecciona las categorías que más te gustan. Usaremos Inteligencia Artificial para recomendarte los mejores lugares.</p>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                {% for cat in categorias %}
+                <label class="cursor-pointer border border-gray-200 rounded-lg p-4 flex justify-between items-center hover:bg-blue-50 hover:border-blue-300 transition-colors">
+                    <span class="font-medium text-gray-700">{{ cat.icono }} {{ cat.nombre }}</span>
+                    <input type="checkbox" name="intereses" value="{{ cat.id }}" class="checkbox checkbox-primary" 
+                           {% if cat.id in intereses_actuales %}checked{% endif %} />
+                </label>
+                {% endfor %}
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-800 border-b pb-2 mb-6 mt-10">Datos Demográficos 🌎</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Edad</label>
+                    <input type="number" name="edad" value="{{ perfil.edad|default_if_none:'' }}" placeholder="Ej. 25" class="input input-bordered w-full border-gray-300">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Nacionalidad</label>
+                    <input type="text" name="nacionalidad" value="{{ perfil.nacionalidad|default_if_none:'Peruano' }}" class="input input-bordered w-full border-gray-300">
+                </div>
+            </div>
+
+            <div class="flex justify-end mt-6">
+                <button type="submit" class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white border-none w-full sm:w-auto px-10">
+                    Guardar Preferencias 💾
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

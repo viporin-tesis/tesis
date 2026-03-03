@@ -13,39 +13,76 @@
     </div>
   </div>
 </div>
+<div class="mt-8 bg-base-100 p-6 rounded-xl shadow-lg border border-gray-100 relative z-20 mx-4 md:mx-0">
+    <form method="GET" action="{% url 'index' %}" class="flex flex-col md:flex-row gap-4">
+        
+        <div class="flex-1">
+            <input type="text" name="buscar" placeholder="¿Qué lugar buscas? Ej. Boquerón..." 
+                   class="input input-bordered w-full border-blue-200 focus:border-blue-500" 
+                   value="{{ request.GET.buscar }}">
+        </div>
+
+        <div class="w-full md:w-1/4">
+            <select name="categoria" class="select select-bordered w-full border-blue-200">
+                <option value="">Todas las categorías</option>
+                {% for cat in categorias %}
+                    <option value="{{ cat.id }}" {% if request.GET.categoria == cat.id|stringformat:"s" %}selected{% endif %}>
+                        {{ cat.icono }} {{ cat.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button type="submit" class="btn btn-primary bg-blue-600 hover:bg-blue-700 border-none text-white">
+            Buscar 🔍
+        </button>
+        
+        {% if request.GET.buscar or request.GET.categoria %}
+            <a href="{% url 'index' %}" class="btn btn-ghost text-gray-500">Limpiar</a>
+        {% endif %}
+    </form>
+</div>
 
 <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+    
+    {% for lugar in lugares %}
     <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-        <figure><img src="https://images.unsplash.com/photo-1566371486490-560ded23b5e4?auto=format&fit=crop&w=400&q=80" alt="Isla" /></figure>
+        <figure>
+            {% if lugar.imagen %}
+                <img src="{{ lugar.imagen.url }}" alt="{{ lugar.nombre }}" class="h-48 w-full object-cover" />
+            {% else %}
+                <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80" alt="Playa por defecto" class="h-48 w-full object-cover" />
+            {% endif %}
+        </figure>
         <div class="card-body">
-            <h2 class="card-title text-blue-800">Boquerón del Diablo</h2>
-            <p>Formación rocosa impresionante con vistas panorámicas al océano.</p>
-            <div class="card-actions justify-end">
-                <div class="badge badge-outline">Naturaleza</div>
+            <h2 class="card-title text-blue-800 hover:text-blue-600 transition-colors">
+    <a href="{% url 'detalle_lugar' lugar.id %}">{{ lugar.nombre }}</a></h2>
+            <p class="text-sm text-gray-600 line-clamp-2">{{ lugar.descripcion }}</p>
+            
+            <div class="card-actions justify-between items-center mt-4">
+                <span class="text-lg font-bold text-green-600">
+                    {% if lugar.precio == 0 %}
+                        ¡Gratis!
+                    {% else %}
+                        S/ {{ lugar.precio }}
+                    {% endif %}
+                </span>
+                
+                {% if lugar.categoria %}
+                <div class="badge badge-outline">
+                    {{ lugar.categoria.icono }} {{ lugar.categoria.nombre }}
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
+    
+    {% empty %}
+    <div class="col-span-3 text-center py-10">
+        <h3 class="text-2xl font-bold text-gray-500">Aún no hay lugares turísticos registrados.</h3>
+        <p class="text-gray-400 mt-2">Ve al panel de administración y agrega algunos para verlos aquí.</p>
+    </div>
+    {% endfor %}
 
-    <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-        <figure><img src="https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&w=400&q=80" alt="Comida" /></figure>
-        <div class="card-body">
-            <h2 class="card-title text-blue-800">Gastronomía Local</h2>
-            <p>Los mejores ceviches y pescados frescos directo del puerto.</p>
-            <div class="card-actions justify-end">
-                <div class="badge badge-outline">Restaurantes</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-        <figure><img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=400&q=80" alt="Buceo" /></figure>
-        <div class="card-body">
-            <h2 class="card-title text-blue-800">Deportes Acuáticos</h2>
-            <p>Experiencias de buceo y paseos en bote por las islas.</p>
-            <div class="card-actions justify-end">
-                <div class="badge badge-outline">Aventura</div>
-            </div>
-        </div>
-    </div>
 </div>
 {% endblock %}
