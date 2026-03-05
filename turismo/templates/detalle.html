@@ -46,19 +46,38 @@
                 </a>
                 {% endif %}
 
-                <button class="btn btn-outline btn-primary">Dejar una Reseña</button>
+                <a href="#seccion-resenas" class="btn btn-outline btn-primary">Dejar una Reseña</a>
                 <button class="btn btn-primary">Añadir a mi Itinerario</button>
+            </div>
+            <div class="divider mt-8">Comparte este lugar</div>
+            
+            <div class="flex justify-center gap-4">
+                <a href="https://api.whatsapp.com/send?text=¡Mira este increíble lugar en Pucusana! Te invito a visitarlo: {{ request.build_absolute_uri }}" 
+                   target="_blank" 
+                   class="btn btn-sm bg-[#25D366] hover:bg-[#128C7E] text-white border-none shadow-sm">
+                   WhatsApp 💬
+                </a>
+
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" 
+                   target="_blank" 
+                   class="btn btn-sm bg-[#1877F2] hover:bg-[#166FE5] text-white border-none shadow-sm">
+                   Facebook 📘
+                </a>
+
+                <button onclick="navigator.clipboard.writeText('{{ request.build_absolute_uri }}'); alert('¡Enlace copiado! Ya puedes pegarlo en Instagram o donde quieras.');" 
+                        class="btn btn-sm btn-outline border-gray-300 text-gray-700 hover:bg-gray-100 shadow-sm">
+                   Copiar Link 🔗
+                </button>
             </div>
         </div>
     </div>
 </div>
 {% if lugar.latitud and lugar.longitud %}
-<div class="mt-12 bg-white p-6 rounded-xl shadow-lg">
+<div id="seccion-resenas" class="mt-12 bg-white p-6 rounded-xl shadow-lg mb-10">
     <h3 class="text-2xl font-bold text-blue-900 mb-4">Ubicación en el Mapa 📍</h3>
     
     <div id="mapa" class="h-96 w-full rounded-xl border-2 border-blue-100 z-0 relative"></div>
 </div>
-<div id="mapa" class="h-96 w-full rounded-xl border-2 border-blue-100 z-0 relative"></div>
 
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -90,5 +109,64 @@
     <p class="text-gray-500">🗺️ Las coordenadas de este lugar aún no han sido registradas en el sistema.</p>
 </div>
 {% endif %}
+<div class="mt-12 bg-white p-6 rounded-xl shadow-lg mb-10">
+    <h3 class="text-2xl font-bold text-blue-900 mb-6">Comentarios y Reseñas ⭐</h3>
 
+    {% if user.is_authenticated %}
+    <form method="POST" class="bg-gray-50 p-6 rounded-lg border border-gray-200 mb-8">
+        {% csrf_token %}
+        <h4 class="font-bold text-gray-700 mb-4">Deja tu opinión, {{ user.username }}:</h4>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Calificación</label>
+            <select name="calificacion" class="select select-bordered w-full max-w-xs border-blue-200" required>
+                <option value="5">⭐⭐⭐⭐⭐ (Excelente)</option>
+                <option value="4">⭐⭐⭐⭐ (Muy Bueno)</option>
+                <option value="3">⭐⭐⭐ (Bueno)</option>
+                <option value="2">⭐⭐ (Regular)</option>
+                <option value="1">⭐ (Malo)</option>
+            </select>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-2">Tu comentario</label>
+            <textarea name="comentario" rows="3" class="textarea textarea-bordered w-full border-blue-200" placeholder="¿Qué te pareció este lugar?..." required></textarea>
+        </div>
+        
+        <button type="submit" class="btn btn-primary bg-blue-600 hover:bg-blue-700 text-white border-none">
+            Publicar Reseña
+        </button>
+    </form>
+    {% else %}
+    <div class="bg-blue-50 border border-blue-100 p-4 rounded-lg text-center mb-8">
+        <p class="text-blue-800">Para dejar una reseña, necesitas <a href="{% url 'login' %}" class="font-bold underline">iniciar sesión</a> o <a href="{% url 'registro' %}" class="font-bold underline">registrarte</a>.</p>
+    </div>
+    {% endif %}
+
+    <div class="space-y-6">
+        {% for resena in resenas %}
+        <div class="border-b border-gray-100 pb-6 last:border-0">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="avatar placeholder">
+                  <div class="bg-blue-100 text-blue-600 rounded-full w-10">
+                    <span class="font-bold">{{ resena.usuario.username|make_list|first|upper }}</span>
+                  </div>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-800">{{ resena.usuario.username }}</h5>
+                    <p class="text-xs text-gray-400">{{ resena.fecha|date:"d M, Y" }}</p>
+                </div>
+                <div class="ml-auto text-yellow-400 text-sm">
+                    {% for i in "12345" %}
+                        {% if forloop.counter <= resena.calificacion %}★{% else %}☆{% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+            <p class="text-gray-600 mt-2 pl-12">{{ resena.comentario }}</p>
+        </div>
+        {% empty %}
+        <p class="text-gray-500 text-center italic py-4">Aún no hay comentarios. ¡Sé el primero en opinar!</p>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

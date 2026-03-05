@@ -17,6 +17,13 @@
         <ul class="menu menu-horizontal px-1 items-center">
             
             {% if user.is_authenticated %}
+            {% if user.is_staff %}
+                <li>
+                    <a href="{% url 'dashboard_municipal' %}" class="btn btn-ghost font-semibold text-purple-700 hover:bg-purple-50 mr-2">
+                        📊 Panel Gestor
+                    </a>
+                </li>
+            {% endif %}
                 <a href="{% url 'perfil' %}" class="btn btn-ghost font-semibold text-blue-700 hover:bg-blue-50">
                 👤 Mi Perfil ({{ user.username }})</a>
                 <li>

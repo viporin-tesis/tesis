@@ -14,4 +14,9 @@ urlpatterns = [
     # ... tus otras rutas ...
     path('registro/', views.registro, name='registro'),
     path('perfil/', views.perfil, name='perfil'), # <--- NUEVA RUTA
+
+   
+    
+    # NUEVA RUTA PARA EL DASHBOARD MUNICIPAL
+    path('dashboard/', views.dashboard_municipal, name='dashboard_municipal'),
 ]

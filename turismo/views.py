@@ -1,10 +1,13 @@
 from django.shortcuts import render, get_object_or_404 # Agregamos get_object_or_404
-from .models import Lugar, Categoria
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.shortcuts import render, get_object_or_404, redirect # Agregamos redirect
 from django.contrib.auth.decorators import login_required
 from .models import Lugar, Categoria, PerfilUsuario # Asegúrate de tener PerfilUsuario aquí
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Lugar, Categoria, PerfilUsuario, Resena # <--- Asegúrate de importar Resena
+from django.contrib.admin.views.decorators import staff_member_required
+from django.db.models import Avg, Count
 
 def index(request):
     # 1. Traemos todos los lugares y todas las categorías iniciales
@@ -33,11 +36,33 @@ def index(request):
 
 # NUEVA VISTA
 def detalle_lugar(request, lugar_id):
-    # Busca el lugar por su ID, si no existe, lanza error 404
     lugar = get_object_or_404(Lugar, id=lugar_id)
-    contexto = {'lugar': lugar}
+    
+    # 1. Traemos todas las reseñas de este lugar, de la más nueva a la más vieja
+    resenas = lugar.resenas.all().order_by('-fecha')
+
+    # 2. Lógica para guardar un nuevo comentario
+    if request.method == 'POST' and request.user.is_authenticated:
+        comentario_texto = request.POST.get('comentario')
+        calificacion_num = request.POST.get('calificacion')
+        
+        if comentario_texto and calificacion_num:
+            # Creamos la reseña en la base de datos
+            Resena.objects.create(
+                lugar=lugar,
+                usuario=request.user,
+                calificacion=int(calificacion_num),
+                comentario=comentario_texto
+            )
+            # Recargamos la página para que aparezca el nuevo comentario
+            return redirect('detalle_lugar', lugar_id=lugar.id)
+
+    # 3. Enviamos el lugar y sus reseñas al HTML
+    contexto = {
+        'lugar': lugar,
+        'resenas': resenas
+    }
     return render(request, 'detalle.html', contexto)
-# NUEVA VISTA: Registro de Usuarios
 def registro(request):
     if request.method == 'POST':
         # Si el usuario envió sus datos, los procesamos
@@ -80,3 +105,25 @@ def perfil(request):
         'intereses_actuales': perfil_obj.intereses.values_list('id', flat=True)
     }
     return render(request, 'perfil.html', contexto)
+# NUEVA VISTA: Dashboard Municipal con Chart.js (HU11a)
+@staff_member_required # Solo usuarios marcados como "Staff" pueden entrar
+def dashboard_municipal(request):
+    # 1. Gráfico de Dona: ¿Cuántos lugares hay por categoría?
+    categorias = Categoria.objects.annotate(total=Count('lugar'))
+    nombres_categorias = [c.nombre for c in categorias]
+    totales_categorias = [c.total for c in categorias]
+
+    # 2. Gráfico de Barras: Top 5 lugares con mejor calificación
+    lugares_top = Lugar.objects.annotate(promedio=Avg('resenas__calificacion')).order_by('-promedio')[:5]
+    nombres_lugares = [l.nombre for l in lugares_top]
+    # Si un lugar no tiene reseñas, su promedio es None, lo convertimos a 0
+    promedios_lugares = [float(l.promedio or 0) for l in lugares_top]
+
+    # Enviamos las listas al HTML
+    contexto = {
+        'nombres_categorias': nombres_categorias,
+        'totales_categorias': totales_categorias,
+        'nombres_lugares': nombres_lugares,
+        'promedios_lugares': promedios_lugares,
+    }
+    return render(request, 'dashboard.html', contexto)
