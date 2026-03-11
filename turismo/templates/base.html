@@ -66,5 +66,24 @@
       </div>
     </div>
     {% endif %}
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Busca todos los mensajes de alerta/toast que tengas en la pantalla
+        const alertas = document.querySelectorAll('.toast, .alert'); 
+        
+        if (alertas.length > 0) {
+            setTimeout(function() {
+                alertas.forEach(function(alerta) {
+                    // Animación suave de desvanecimiento
+                    alerta.style.transition = "opacity 0.5s ease";
+                    alerta.style.opacity = "0";
+                    
+                    // Lo eliminamos del HTML después de la animación
+                    setTimeout(() => alerta.remove(), 500); 
+                });
+            }, 3000); // 3000 milisegundos = 3 segundos de espera
+        }
+    });
+</script>
 </body>
 </html>
