@@ -14,6 +14,17 @@
             </form>
             <p class="mt-6 text-center text-sm text-gray-600">
                 ¿Aún no tienes cuenta? <a href="{% url 'registro' %}" class="text-blue-600 font-bold hover:underline">Regístrate aquí</a>
+                <div class="relative flex py-5 items-center">
+                <div class="flex-grow border-t border-gray-200"></div>
+                <span class="flex-shrink-0 mx-4 text-gray-400 text-sm">Acceso Municipal</span>
+                <div class="flex-grow border-t border-gray-200"></div>
+            </div>
+
+            <div class="text-center">
+                <a href="/admin/" class="btn btn-outline btn-sm w-full text-blue-700 hover:bg-blue-50 border-blue-200 rounded-lg">
+                    Panel de Gestión (Administradores) 🏢
+                </a>
+            </div>
             </p>
         </div>
 
@@ -21,4 +32,4 @@
         </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %}  

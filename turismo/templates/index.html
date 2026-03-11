@@ -1,6 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if user.is_staff %}
+    <div class="mb-6 flex justify-end bg-blue-50 p-3 rounded-lg border border-blue-100 shadow-sm">
+        <div class="flex items-center gap-4">
+            <span class="text-blue-800 font-medium text-sm">Modo Administrador Activo 🛡️</span>
+            <a href="/admin/" class="btn btn-sm bg-blue-900 hover:bg-blue-800 text-white border-none shadow-md">
+                ⚙️ Volver al Panel de Control
+            </a>
+        </div>
+    </div>
+    {% endif %}
 <div class="hero min-h-[60vh] rounded-xl overflow-hidden relative" style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80');">
   <div class="hero-overlay bg-opacity-60 bg-black"></div>
   <div class="hero-content text-center text-neutral-content relative z-10">
