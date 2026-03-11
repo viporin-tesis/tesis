@@ -8,6 +8,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Lugar, Categoria, PerfilUsuario, Resena # <--- Asegúrate de importar Resena
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Avg, Count
+from .ml_engine import obtener_recomendaciones_rf
 
 # NUEVA VISTA: Portada de Bienvenida
 def landing(request):
@@ -35,13 +36,23 @@ def index(request):
         # Filtramos por el ID de la categoría seleccionada
         lugares_lista = lugares_lista.filter(categoria_id=categoria_id)
         
+    # 4. APLICAMOS LA INTELIGENCIA ARTIFICIAL (HU11b)
+    # Iniciamos la lista vacía por si es un visitante o un admin
+    recomendados_ids = [] 
+    
+    if request.user.is_authenticated and not request.user.is_staff:
+        # Le pasamos a la IA la lista de lugares (ya sea completa o filtrada)
+        # para que calcule las probabilidades y ponga el mejor al principio
+        lugares_lista, recomendados_ids = obtener_recomendaciones_rf(request.user, lugares_lista)
+        
+    # 5. Enviamos todo al HTML
     contexto = {
         'lugares': lugares_lista,
-        'categorias': categorias_lista, # Enviamos las categorías al HTML
+        'categorias': categorias_lista, 
+        'recomendados_ids': recomendados_ids, # ¡Vital para que aparezca la etiqueta amarilla!
     }
     
     return render(request, 'index.html', contexto)
-
 # NUEVA VISTA
 def detalle_lugar(request, lugar_id):
     lugar = get_object_or_404(Lugar, id=lugar_id)

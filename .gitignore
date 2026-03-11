@@ -5,3 +5,5 @@ db.sqlite3
 .env
 media/
 static/
+# Archivos pesados de Machine Learning
+*.pkl

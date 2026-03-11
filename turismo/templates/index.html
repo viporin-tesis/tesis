@@ -63,6 +63,11 @@
             {% else %}
                 <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80" alt="Playa por defecto" class="h-48 w-full object-cover" />
             {% endif %}
+                 {% if lugar.id in recomendados_ids %}
+    <div class="absolute top-2 right-2 bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full shadow-md z-10 animate-bounce">
+        ⭐ Recomendado para ti
+    </div>
+    {% endif %}
         </figure>
         <div class="card-body">
             <h2 class="card-title text-blue-800 hover:text-blue-600 transition-colors">
