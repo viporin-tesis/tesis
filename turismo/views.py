@@ -9,6 +9,14 @@ from .models import Lugar, Categoria, PerfilUsuario, Resena # <--- Asegúrate de
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Avg, Count
 
+# NUEVA VISTA: Portada de Bienvenida
+def landing(request):
+    # Si el usuario ya está logueado (tiene cuenta), lo mandamos directo al catálogo
+    if request.user.is_authenticated:
+        return redirect('index')
+    # Si es visitante nuevo, le mostramos la portada
+    return render(request, 'landing.html')
+
 def index(request):
     # 1. Traemos todos los lugares y todas las categorías iniciales
     lugares_lista = Lugar.objects.all()
@@ -70,7 +78,7 @@ def registro(request):
         if form.is_valid():
             usuario = form.save() # Guarda el usuario en la base de datos
             login(request, usuario) # Inicia sesión automáticamente
-            return redirect('index') # Lo manda a la página principal
+            return redirect('perfil') # Lo manda a la página principal
     else:
         # Si acaba de entrar a la página, le mostramos el formulario vacío
         form = UserCreationForm()

@@ -150,3 +150,9 @@ SESSION_SAVE_EVERY_REQUEST = True
 # 4. Le dice a Django a dónde enviar a la gente si su sesión expira o intentan 
 # entrar a una página prohibida sin iniciar sesión
 LOGIN_URL = 'login'
+
+# A dónde ir después de iniciar sesión con éxito (al catálogo)
+LOGIN_REDIRECT_URL = 'index' 
+
+# A dónde ir después de cerrar sesión (a la portada pública)
+LOGOUT_REDIRECT_URL = 'landing'
