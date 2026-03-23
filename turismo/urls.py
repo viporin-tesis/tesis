@@ -20,4 +20,6 @@ urlpatterns = [
     
     # NUEVA RUTA PARA EL DASHBOARD MUNICIPAL
     path('dashboard/', views.dashboard_municipal, name='dashboard_municipal'),
+    # Agrega esta línea debajo de tus otras rutas:
+    path('mapa/', views.mapa_turistico, name='mapa'),
 ]

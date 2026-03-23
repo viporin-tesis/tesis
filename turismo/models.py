@@ -25,6 +25,10 @@ class Lugar(models.Model):
     
     fecha_creacion = models.DateTimeField(auto_now_add=True)
 
+    # NUEVOS CAMPOS PARA EL MAPA:
+    latitud = models.FloatField(default=-12.4830, help_text="Latitud para Google Maps")
+    longitud = models.FloatField(default=-76.7960, help_text="Longitud para Google Maps")
+
     def __str__(self):
         return self.nombre
 

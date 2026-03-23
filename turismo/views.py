@@ -147,3 +147,9 @@ def dashboard_municipal(request):
         'promedios_lugares': promedios_lugares,
     }
     return render(request, 'dashboard.html', contexto)
+
+# NUEVA VISTA: Mapa Interactivo (HU Nivel 3)
+def mapa_turistico(request):
+    # Traemos todos los lugares de la base de datos para ponerles un pin
+    lugares = Lugar.objects.all()
+    return render(request, 'mapa.html', {'lugares': lugares})
