@@ -1,18 +1,57 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<!-- Bloque del Globo Flotante de Notificación de Éxito (Django Messages) -->
+{% if messages %}
+<div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 animate-fade-in-down">
+    {% for message in messages %}
+    <div class="flex items-center gap-3 bg-emerald-600 text-white px-5 py-4 rounded-xl shadow-2xl min-w-[300px] border border-emerald-500 transition-all duration-300 max-w-md">
+        <span class="text-2xl">🤖</span>
+        <div class="flex-1">
+            <p class="font-semibold text-sm leading-tight">{{ message }}</p>
+        </div>
+        <button onclick="this.parentElement.remove()" class="text-white hover:text-emerald-200 transition-colors font-bold text-lg p-1">
+            ✕
+        </button>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pequeño script para desvanecer el globo automáticamente después de 5 segundos -->
+<script>
+    setTimeout(() => {
+        const toastContainer = document.getElementById('toast-container');
+        if (toastContainer) {
+            toastContainer.style.opacity = '0';
+            setTimeout(() => toastContainer.remove(), 300);
+        }
+    }, 5000);
+</script>
+{% endif %}
+
 <div class="container mx-auto mt-10 p-4 max-w-3xl">
     
     <div class="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100">
         
-        <div class="bg-blue-600 p-6 text-white text-center">
+        <!-- Cabecera de Perfil con Paleta Costera y Muestra del Correo Electrónico -->
+        <div class="bg-blue-900 p-6 text-white text-center">
             <div class="avatar placeholder mb-4">
-              <div class="bg-white text-blue-600 rounded-full w-20 ring ring-white ring-offset-base-100 ring-offset-2">
+              <div class="bg-white text-blue-900 rounded-full w-20 ring ring-white ring-offset-base-100 ring-offset-2">
                 <span class="text-3xl font-bold">{{ user.username|make_list|first|upper }}</span>
               </div>
             </div>
             <h2 class="text-3xl font-bold">Perfil de {{ user.username }}</h2>
-            <p class="text-blue-100 mt-2">Personaliza tu experiencia en Explora Pucusana</p>
+            
+            <!-- Muestra del Correo Electrónico del Turista -->
+            {% if user.email %}
+            <p class="text-blue-200 text-sm mt-1 flex items-center justify-center gap-1.5 font-mono">
+                📧 <span>{{ user.email }}</span>
+            </p>
+            {% else %}
+            <p class="text-amber-300 text-xs mt-1 italic">⚠️ Correo no registrado</p>
+            {% endif %}
+            
+            <p class="text-blue-100 mt-2 text-sm">Personaliza tu experiencia en Explora Pucusana</p>
         </div>
 
         <form method="POST" class="p-8">

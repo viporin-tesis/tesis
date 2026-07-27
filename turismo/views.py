@@ -1,14 +1,16 @@
+import os
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import login
 from django.contrib.auth.decorators import login_required
 from django.contrib.admin.views.decorators import staff_member_required
 from django.db.models import Avg, Count
+from django.contrib import messages  # Importación clave para los globos de éxito
+from django.contrib.auth.models import User
 
 # Importamos nuestros modelos y el motor de IA
 from .models import Lugar, Categoria, PerfilUsuario, Resena 
 from .ml_engine import obtener_recomendaciones_rf
-
 
 # NUEVA VISTA: Portada de Bienvenida
 def landing(request):
@@ -68,12 +70,19 @@ def detalle_lugar(request, lugar_id):
         calificacion_num = request.POST.get('calificacion')
         
         if comentario_texto and calificacion_num:
+            # Regla de Negocio / Test: Sanitización sintáctica de comentarios obscenos
+            palabras_prohibidas = ['insulto1', 'obsceno2']
+            if any(palabra in comentario_texto.lower() for palabra in palabras_prohibidas):
+                messages.error(request, "Tu comentario contiene palabras inapropiadas no permitidas en la plataforma.")
+                return redirect('detalle_lugar', lugar_id=lugar.id)
+
             Resena.objects.create(
                 lugar=lugar,
                 usuario=request.user,
                 calificacion=int(calificacion_num),
-                comentario=comentario_texto
+                commentario=comentario_texto
             )
+            messages.success(request, "¡Tu reseña ha sido publicada exitosamente!")
             return redirect('detalle_lugar', lugar_id=lugar.id)
 
     # 3. Enviamos el lugar y sus reseñas al HTML
@@ -88,9 +97,25 @@ def detalle_lugar(request, lugar_id):
 def registro(request):
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
+        correo_ingresado = request.POST.get('email', '').strip()
+        
+        # 1. Validación en base de datos (SQLite): Verificar si el correo ya existe
+        if correo_ingresado:
+            correo_duplicado = User.objects.filter(email__iexact=correo_ingresado).exists()
+            if correo_duplicado:
+                messages.error(request, "⚠️ El correo electrónico ya se encuentra registrado en Explora Pucusana.")
+                contexto = {'form': form}
+                return render(request, 'registro.html', contexto)
+        
+        # 2. Si el correo no está duplicado, procedemos con las validaciones nativas del formulario
         if form.is_valid():
-            usuario = form.save() 
+            usuario = form.save(commit=False)  # Creamos la instancia en memoria sin guardar aún
+            usuario.email = correo_ingresado   # Asignamos el correo electrónico validado
+            usuario.save()                     # Guardamos de forma definitiva en la base de datos
+            
             login(request, usuario) 
+            # Inyectamos el globo de éxito para la redirección al Perfil
+            messages.success(request, f"¡Registro completado con éxito! Bienvenido(a), {usuario.username}.")
             return redirect('perfil') 
     else:
         form = UserCreationForm()
@@ -99,7 +124,7 @@ def registro(request):
     return render(request, 'registro.html', contexto)
 
 
-# NUEVA VISTA: Perfil e Intereses (HU06) - ¡CORREGIDA!
+# NUEVA VISTA: Perfil e Intereses (HU06) - ¡ACTUALIZADA CON MESSAGES!
 @login_required 
 def perfil(request):
     perfil_obj, creado = PerfilUsuario.objects.get_or_create(usuario=request.user)
@@ -115,7 +140,8 @@ def perfil(request):
         perfil_obj.intereses.set(intereses_seleccionados) 
         perfil_obj.save()
 
-        # 🌟 Redirigimos automáticamente al catálogo usando el nombre correcto de la ruta
+        # Inyectamos un mensaje flotante de confirmación antes de volver al catálogo principal
+        messages.success(request, "🎯 Preferencias actualizadas. El motor de Inteligencia Artificial ha reestructurado tu catálogo.")
         return redirect('index') 
 
     # 3. Preparamos los datos para mandarlos al HTML
@@ -125,7 +151,6 @@ def perfil(request):
         'intereses_actuales': perfil_obj.intereses.values_list('id', flat=True)
     }
     
-    # 4. Y finalmente dibujamos la página (eliminamos el render intruso que estaba arriba)
     return render(request, 'perfil.html', contexto)
 
 
@@ -147,6 +172,7 @@ def dashboard_municipal(request):
         'promedios_lugares': promedios_lugares,
     }
     return render(request, 'dashboard.html', contexto)
+
 
 # NUEVA VISTA: Mapa Interactivo (HU Nivel 3)
 def mapa_turistico(request):

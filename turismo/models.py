@@ -28,6 +28,9 @@ class Lugar(models.Model):
     # NUEVOS CAMPOS PARA EL MAPA:
     latitud = models.FloatField(default=-12.4830, help_text="Latitud para Google Maps")
     longitud = models.FloatField(default=-76.7960, help_text="Longitud para Google Maps")
+    class Meta:
+        verbose_name = "Lugar"
+        verbose_name_plural = "Lugares"
 
     def __str__(self):
         return self.nombre
